@@ -1,6 +1,6 @@
 require 'fileutils'
-
-class PreCommit
+require 'xcode-yamlizer'
+module XcodeYamlizer
   class Cli
 
     PRE_COMMIT_HOOK_PATH = '.git/hooks/pre-commit'
@@ -32,7 +32,7 @@ class PreCommit
     end
 
     def install_pre_commit_hook
-      hook = File.join(PreCommit.root, 'templates', 'pre-commit-hook')
+      hook = File.join(XcodeYamlizer.root, 'templates', 'pre-commit-hook')
       FileUtils.cp(hook, PRE_COMMIT_HOOK_PATH)
       FileUtils.chmod(0755, PRE_COMMIT_HOOK_PATH)
     end

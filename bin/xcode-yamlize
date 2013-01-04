@@ -5,7 +5,7 @@ require 'xcode-yamlizer/cli'
 PRE_COMMIT_HOOK_PATH = '.git/hooks/pre-commit'
 
 if ARGV[0] != "install"
-  puts "Usage: pre-commit install"
+  puts "Usage: xcode-yamlize install"
   exit(1)
 end
 

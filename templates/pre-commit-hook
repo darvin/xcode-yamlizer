@@ -8,11 +8,11 @@ else
   cmd = "ruby -rrubygems "
 end
 
-if !system("#{cmd} -rpre-commit -e '' 2> /dev/null")
-  $stderr.puts "pre-commit: WARNING: Skipping checks because the pre-commit gem is not installed. (Did you change your Ruby version?)"
+if !system("#{cmd} -rxcode-yamlizer -e '' 2> /dev/null")
+  $stderr.puts "xcode-yamlizer: WARNING: Skipping checks because xcode-yamlizer the  gem is not installed. (Did you change your Ruby version?)"
   exit(0)
 end
 
-cmd << %Q{-e "require 'pre-commit'; PreCommit.run"}
+cmd << %Q{-e "require 'xcode-yamlizer'; XcodeYamlizer.run_pre_commit"}
 
 exit(system(cmd) ? 0 : 1)

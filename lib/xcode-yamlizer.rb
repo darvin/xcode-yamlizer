@@ -95,6 +95,14 @@ module XcodeYamlizer
       puts "Don't know what to do with '#{input}'"
     end
   end
+
+  def self.root
+    return File.expand_path('../..', __FILE__)
+  end
+
+  def self.run_pre_commit
+    convert_directory(File.expand_path('./')+"/", false)
+  end
 end
 
 
