@@ -1,0 +1,37 @@
+# encoding: UTF-8
+require 'xcode-yamlizer/version'
+
+$KCODE = 'UTF8' unless RUBY_VERSION >= '1.9'
+require 'args_parser'
+require 'xcode-yamlizer'
+
+puts XcodeYamlizer.public_instance_methods
+
+parser = ArgsParser.parse ARGV do
+  arg :input, 'convert file (autodetects direction)', :alias => :i
+  arg :dir, 'convert directory (default direction - from XCode to YAML)', :alias => :d
+  arg :to_xcode, 'direction: from YAML to XCode format'
+  arg :verbose, 'verbose mode'
+  arg :help, 'show help', :alias => :h
+  validate :input, "invalid file" do |v|
+    File.exist?(v)
+  end
+end
+
+if parser.has_option? :help \
+    or (!parser.has_param?(:input) and !parser.has_param? :dir) \
+    or (parser.has_param?(:input) and parser.has_param?(:dir))
+  STDERR.puts parser.help
+  exit 1
+end
+
+
+
+
+if parser.has_param? :input
+  XcodeYamlizer::convert_file parser[:input]
+end
+
+if parser.has_param? :dir
+  XcodeYamlizer::convert_directory parser[:dir], parser.has_option?(:to_xcode)
+end
