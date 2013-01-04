@@ -1,16 +1,4 @@
-# Xcode::Yamlizer
-
-TODO: Write a gem description
-
-## Installation
-
-Install XcodeYamlizer with:
-
-    $ gem install xcode-yamlizer
-
-## Usage
-
-### Preamble
+# XcodeYamlizer
 
 [XCode's](http://stackoverflow.com/questions/2004135/how-to-merge-conflicts-file-project-pbxproj-in-xcode-use-svn) 
 [formats](http://stackoverflow.com/questions/4022362/merging-xcode-project-files)
@@ -20,6 +8,15 @@ They are pain to merge and are impossible to read. YAML is pretty.
 
 Imagine a brave new world with XCode's `nib`s, model files, storyboards,
 project files - all in YAML. Thats what that project do!
+
+
+## Installation
+
+Install XcodeYamlizer with:
+
+    $ gem install xcode-yamlizer
+
+## Usage
 
 ### Git hooks
 
