@@ -1,6 +1,9 @@
 # encoding: UTF-8
 require 'xcode-yamlizer/version'
 require 'xcode-yamlizer/dumpers'
+require 'rugged'
+require 'pathname'
+
 
 $KCODE = 'UTF8' unless RUBY_VERSION >= '1.9'
 require 'pp'
@@ -57,6 +60,45 @@ end
 
 
 
+def repo_add_files(files)
+  repo_dir = '.'
+  repo = Rugged::Repository.new(repo_dir)
+  index = repo.index
+  files.each do |file|
+    file = file.sub(/^\.\//,"")
+    if not index.get_entry(file)
+      #puts "Adding: #{file}"
+      index.add(file)
+    end
+  end
+  index.write()
+end
+
+def repo_remove_files(files)
+  repo_dir = '.'
+  repo = Rugged::Repository.new(repo_dir)
+  index = repo.index
+  files.each do |file|
+    file = file.sub(/^\.\//,"")
+    if index.get_entry(file)
+      #puts "Removing: #{file}"
+      index.remove(file)
+    end
+  end
+  index.write()
+end
+
+def repo_gitignore_add_files(files)
+  
+end
+
+def chroot_to_repo
+  root = File.expand_path("..",Rugged::Repository.discover(Dir.pwd))
+  Dir.chdir(root)
+end
+
+
+
 module XcodeYamlizer
   def self.convert_directory(dir, to_xcode)
     puts "Conventering directory '#{dir}'..."
@@ -72,10 +114,11 @@ module XcodeYamlizer
     
     puts "Found:"
     puts files
-    files.each do |file|
+    new_files = files.map do |file|
       convert_file file
     end
     puts "Finished!"
+    return files, new_files
   end
 
   def self.convert_file(input)
@@ -100,9 +143,23 @@ module XcodeYamlizer
     return File.expand_path('../..', __FILE__)
   end
 
+
   def self.run_pre_commit
-    convert_directory(File.expand_path('./')+"/", false)
+    chroot_to_repo()
+    files_remove, files_add = convert_directory('./', false)
+
+    repo_add_files files_add
+
+    repo_remove_files files_remove
+    repo_gitignore_add_files files_remove
   end
+
+  def self.run_post_merge
+    chroot_to_repo()
+    convert_directory('./', true)
+  end
+
+
 end
 
 

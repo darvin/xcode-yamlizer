@@ -9,6 +9,8 @@ They are pain to merge and are impossible to read. YAML is pretty.
 Imagine a brave new world with XCode's `nib`s, model files, storyboards,
 project files - all in YAML. Thats what that project do!
 
+You can see how pretty it looks on Github in this sample repo.
+
 
 ## Installation
 
