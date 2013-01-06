@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = XcodeYamlizer::VERSION
   gem.authors       = ["Sergey Klimov"]
   gem.email         = ["sergey.v.klimov@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = IO.read("README.md")
+  gem.summary       = %q{Set of git hooks to store YAML files instead of Xcode projects and nibs in repo}
+  gem.homepage      = "https://github.com/darvin/xcode-yamlizer"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
