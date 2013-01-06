@@ -8,7 +8,6 @@ Gem::Specification.new do |gem|
   gem.version       = XcodeYamlizer::VERSION
   gem.authors       = ["Sergey Klimov"]
   gem.email         = ["sergey.v.klimov@gmail.com"]
-  gem.description   = IO.read("README.md")
   gem.summary       = %q{Set of git hooks to store YAML files instead of Xcode projects and nibs in repo}
   gem.homepage      = "https://github.com/darvin/xcode-yamlizer"
 
