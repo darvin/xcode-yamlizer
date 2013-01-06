@@ -2,7 +2,6 @@
 
 require 'xcode-yamlizer/cli'
 
-PRE_COMMIT_HOOK_PATH = '.git/hooks/pre-commit'
 
 if ARGV[0] != "install"
   puts "Usage: xcode-yamlize install"
@@ -15,7 +14,7 @@ if !File.exists?(".git")
 end
 
 cli = XcodeYamlizer::Cli.new
-cli.install
+installed_hooks = cli.install_all
 
-puts "Installed hook: #{PRE_COMMIT_HOOK_PATH}"
+puts "Installed hooks: #{installed_hooks}"
 puts

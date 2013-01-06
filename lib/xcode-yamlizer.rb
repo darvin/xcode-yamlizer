@@ -65,7 +65,6 @@ def repo_add_files(files)
   repo = Rugged::Repository.new(repo_dir)
   index = repo.index
   files.each do |file|
-    file = file.sub(/^\.\//,"")
     if not index.get_entry(file)
       #puts "Adding: #{file}"
       index.add(file)
@@ -79,7 +78,6 @@ def repo_remove_files(files)
   repo = Rugged::Repository.new(repo_dir)
   index = repo.index
   files.each do |file|
-    file = file.sub(/^\.\//,"")
     if index.get_entry(file)
       #puts "Removing: #{file}"
       index.remove(file)
@@ -89,7 +87,33 @@ def repo_remove_files(files)
 end
 
 def repo_gitignore_add_files(files)
+  begin
+    already_ignored = IO.foreach(".gitignore").map do |line|
+      line.chomp
+    end
+  rescue Errno::ENOENT
+    already_ignored = []
+  end
   
+
+  new_ignored = files - already_ignored
+
+  if new_ignored.count > 0
+    File.open(".gitignore", "a") do |f|
+      f.puts "# XcodeYamlizer"
+      new_ignored.each do |line|
+        f.puts line
+      end
+      f.puts "# end"
+    end
+    
+    puts "added to .gitignore:"
+    puts new_ignored
+
+  end
+  
+
+
 end
 
 def chroot_to_repo
@@ -143,11 +167,17 @@ module XcodeYamlizer
     return File.expand_path('../..', __FILE__)
   end
 
+  def self.make_filepaths_non_relative files
+    files.map do |file|
+      file.sub(/^\.\//,"")
+    end
+  end
 
   def self.run_pre_commit
     chroot_to_repo()
     files_remove, files_add = convert_directory('./', false)
-
+    files_remove = make_filepaths_non_relative files_remove
+    files_add = make_filepaths_non_relative files_add
     repo_add_files files_add
 
     repo_remove_files files_remove
