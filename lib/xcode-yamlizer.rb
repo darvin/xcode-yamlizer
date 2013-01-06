@@ -4,6 +4,7 @@ require 'xcode-yamlizer/dumpers'
 require 'rugged'
 require 'pathname'
 
+require 'find'
 
 $KCODE = 'UTF8' unless RUBY_VERSION >= '1.9'
 require 'pp'
@@ -11,7 +12,7 @@ require 'pp'
 
 YAML_FORMATS = [".yaml", ".yml"]
 PLIST_FORMATS = [".pbxproj"]
-XML_FORMATS = [".xib", ".storyboard", /(.*).xcdatamodeld\/(.*).xcdatamodel\/contents/]
+XML_FORMATS = [".xib", ".storyboard", /(.*).xcdatamodeld\/(.*).xcdatamodel\/contents$/]
 
 
 XCODE_FORMATS = PLIST_FORMATS + XML_FORMATS
@@ -67,10 +68,9 @@ def repo_add_files(files)
   files.each do |file|
     if not index.get_entry(file)
       #puts "Adding: #{file}"
-      index.add(file)
+      `git add '#{file}'`
     end
   end
-  index.write()
 end
 
 def repo_remove_files(files)
@@ -80,10 +80,9 @@ def repo_remove_files(files)
   files.each do |file|
     if index.get_entry(file)
       #puts "Removing: #{file}"
-      index.remove(file)
+      `git rm --cached '#{file}'`
     end
   end
-  index.write()
 end
 
 def repo_gitignore_add_files(files)
@@ -95,7 +94,6 @@ def repo_gitignore_add_files(files)
     already_ignored = []
   end
   
-
   new_ignored = files - already_ignored
 
   if new_ignored.count > 0
@@ -124,28 +122,34 @@ end
 
 
 module XcodeYamlizer
-  def self.convert_directory(dir, to_xcode)
-    puts "Conventering directory '#{dir}'..."
+  def self.convert_directory(dir, to_xcode, verbose=false, ignore_paths=[])
+    puts "Conventering directory '#{dir}'..." if verbose
     files = []
     formats = to_xcode ? YAML_FORMATS : XCODE_FORMATS
 
-    Dir.glob(dir+"**/*").each do |filename|
-      if formats.include_filename? filename
-        files += [filename]
-    
+    Find.find(dir) do |path|
+      name = File.basename(path)
+      if FileTest.directory?(path)
+        if ignore_paths.include?(name)
+          Find.prune
+        else
+          next
+        end
+      else
+        files += [path] if formats.include_filename? name
       end
     end
-    
-    puts "Found:"
-    puts files
+
+    puts "Found:" if verbose
+    puts files if verbose
     new_files = files.map do |file|
-      convert_file file
+      convert_file file, verbose
     end
-    puts "Finished!"
+    puts "Finished!" if verbose
     return files, new_files
   end
 
-  def self.convert_file(input)
+  def self.convert_file(input, verbose=false)
     result = nil
     if YAML_FORMATS.include_filename? input
       output = input.chomp(File.extname(input))
@@ -156,7 +160,7 @@ module XcodeYamlizer
     result = load(input)
     dump(output, result)
     if result
-      puts "#{input} => #{output}"
+      puts "#{input} => #{output}" if verbose
       return output
     else
       puts "Don't know what to do with '#{input}'"
@@ -173,9 +177,22 @@ module XcodeYamlizer
     end
   end
 
+  def self.find_submodules
+    paths = `git submodule foreach --quiet 'echo $path'`
+    paths.lines.map do |line|
+      line.chomp
+    end
+  end
+
   def self.run_pre_commit
     chroot_to_repo()
-    files_remove, files_add = convert_directory('./', false)
+    paths_to_ignore = find_submodules
+
+
+    files_remove, files_add = convert_directory('./', \
+                                false, \
+                                false, \
+                                paths_to_ignore)
     files_remove = make_filepaths_non_relative files_remove
     files_add = make_filepaths_non_relative files_add
     repo_add_files files_add
@@ -186,7 +203,8 @@ module XcodeYamlizer
 
   def self.run_post_merge
     chroot_to_repo()
-    convert_directory('./', true)
+    paths_to_ignore = find_submodules
+    convert_directory('./', true, false, paths_to_ignore)
   end
 
 
