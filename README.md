@@ -3,7 +3,7 @@
 [XCode's](http://stackoverflow.com/questions/2004135/how-to-merge-conflicts-file-project-pbxproj-in-xcode-use-svn) 
 [formats](http://stackoverflow.com/questions/4022362/merging-xcode-project-files)
 [are](https://discussions.apple.com/thread/3081125?start=0&tstart=0) 
-[shitty](http://stackoverflow.com/questions/10552082/finding-the-error-in-xcodes-project-pbxproj-after-merge) 
+[shitty](http://stackoverflow.com/questions/10552082/finding-the-error-in-xcodes-project-pbxproj-after-merge).
 They are pain to merge and are impossible to read. YAML is pretty.
 
 Imagine a brave new world with XCode's `nib`s, model files, storyboards,
@@ -33,16 +33,16 @@ You can do that from your project's working directory:
 
 Then, before commit, `pre-commit` hook will:
 
-    # find all obscure `.xib`s, `.xcdatamodel`s, project files, etc.
-    # create appropriate YAML files with the same name + `.yaml` extension
-    # add them to commit (if necessary)
-    # add all obscure files to `.gitignore` (if necessary)
-    # remove all obscure files from git (if necessary) (but will leave them be in file system)
+  - find all obscure `.xib`s, `.xcdatamodel`s, project files, etc.
+  - create appropriate YAML files with the same name + `.yaml` extension
+  - add them to commit (if necessary)
+  - add all obscure files to `.gitignore` (if necessary)
+  - remove all obscure files from git (if necessary) (but will leave them be in file system)
 
 After merge, `post-merge` hook will:
 
-    # copy all obscure files to the same name + `~` postfix
-    # overrite all obscure files from the version controlled `yaml`es.
+  - copy all obscure files to the same name + `~` postfix
+  - overrite all obscure files from the version controlled `yaml`es.
 
 ### Standalone
 
