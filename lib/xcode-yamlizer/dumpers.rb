@@ -1,8 +1,8 @@
 require 'osx/plist'
 require 'cobravsmongoose'
-require 'ya2yaml'
 require 'json'
 require 'yaml'
+YAML::ENGINE.yamler='syck'
 
 class Dumper
   def initialize(filename)
@@ -30,7 +30,6 @@ class YamlDumper < Dumper
     if result
       File.open(@filename, 'w') do |f|
         f.write(result)
-        #f.write(object.ya2yaml(:syck_compatible => false))
       end
     end
   end

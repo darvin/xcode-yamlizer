@@ -9,7 +9,11 @@ They are pain to merge and are impossible to read. YAML is pretty.
 Imagine a brave new world with XCode's `nib`s, model files, storyboards,
 project files - all in YAML. Thats what that project do!
 
-You can see how pretty it looks on Github in this sample repo.
+You can see [how] (https://github.com/darvin/iHubot/blob/xcode-yamlizer/iHubot/iHubot.xcdatamodeld/iHubot.xcdatamodel/contents.yaml)
+[pretty] (https://github.com/darvin/iHubot/blob/xcode-yamlizer/iHubot/iHubot.xcdatamodeld/.xccurrentversion.yaml)
+[it] (https://github.com/darvin/iHubot/blob/xcode-yamlizer/iHubot/ViewController.xib.yaml)
+[looks] (https://github.com/darvin/iHubot/blob/xcode-yamlizer/iHubot.xcodeproj/project.pbxproj.yaml)
+on Github in this sample [repo](https://github.com/darvin/iHubot/blob/xcode-yamlizer/).
 
 
 ## Installation

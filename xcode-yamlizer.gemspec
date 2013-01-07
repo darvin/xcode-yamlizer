@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "args_parser"
   gem.add_runtime_dependency 'kballard-osx-plist'
   gem.add_runtime_dependency 'cobravsmongoose'
-  gem.add_runtime_dependency 'ya2yaml'
   gem.add_runtime_dependency 'json'
   gem.add_runtime_dependency 'rugged'
 end

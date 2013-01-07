@@ -12,7 +12,10 @@ require 'pp'
 
 YAML_FORMATS = [".yaml", ".yml"]
 PLIST_FORMATS = [".pbxproj"]
-XML_FORMATS = [".xib", ".storyboard", /(.*).xcdatamodeld\/(.*).xcdatamodel\/contents$/]
+XML_FORMATS = [".xib", ".storyboard", \
+    /(.*).xcdatamodeld\/(.*).xcdatamodel\/contents$/, \
+    /(.*).xccurrentversion$/
+]
 
 
 XCODE_FORMATS = PLIST_FORMATS + XML_FORMATS
@@ -28,7 +31,7 @@ DUMPERS = [
 module Enumerable
   def include_filename?(filename)
     self.each do |elem|
-      if elem.kind_of? Regexp and filename =~ elem
+      if elem.kind_of? Regexp and elem.match(filename)
         return true
       end
     end
@@ -62,26 +65,14 @@ end
 
 
 def repo_add_files(files)
-  repo_dir = '.'
-  repo = Rugged::Repository.new(repo_dir)
-  index = repo.index
   files.each do |file|
-    if not index.get_entry(file)
-      #puts "Adding: #{file}"
-      `git add '#{file}'`
-    end
+    `git add '#{file}'`
   end
 end
 
 def repo_remove_files(files)
-  repo_dir = '.'
-  repo = Rugged::Repository.new(repo_dir)
-  index = repo.index
   files.each do |file|
-    if index.get_entry(file)
-      #puts "Removing: #{file}"
       `git rm --cached '#{file}'`
-    end
   end
 end
 
@@ -107,6 +98,7 @@ def repo_gitignore_add_files(files)
     
     puts "added to .gitignore:"
     puts new_ignored
+    repo_add_files [".gitignore"]
 
   end
   
@@ -128,15 +120,15 @@ module XcodeYamlizer
     formats = to_xcode ? YAML_FORMATS : XCODE_FORMATS
 
     Find.find(dir) do |path|
-      name = File.basename(path)
       if FileTest.directory?(path)
-        if ignore_paths.include?(name)
+        if ignore_paths.include?(path) or ignore_paths.include? path.gsub(/^\.\//,"")
+          puts "Ignored in submodule: #{path}" if verbose
           Find.prune
         else
           next
         end
       else
-        files += [path] if formats.include_filename? name
+        files += [path] if formats.include_filename? path
       end
     end
 
@@ -153,6 +145,7 @@ module XcodeYamlizer
     result = nil
     if YAML_FORMATS.include_filename? input
       output = input.chomp(File.extname(input))
+      FileUtils.cp output, "#{output}~"
     elsif XCODE_FORMATS.include_filename? input
       output = "#{input}.yaml"
 
@@ -191,7 +184,7 @@ module XcodeYamlizer
 
     files_remove, files_add = convert_directory('./', \
                                 false, \
-                                false, \
+                                true, \
                                 paths_to_ignore)
     files_remove = make_filepaths_non_relative files_remove
     files_add = make_filepaths_non_relative files_add
